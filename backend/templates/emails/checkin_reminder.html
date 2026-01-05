@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Check-in Reminder</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #374151;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 32px;
+            margin: 20px 0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+        h1 {
+            color: #111827;
+            font-size: 24px;
+            margin: 0 0 16px 0;
+        }
+        .readiness-score {
+            text-align: center;
+            padding: 24px;
+            background-color: #f0fdf4;
+            border-radius: 8px;
+            margin: 24px 0;
+        }
+        .score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #059669;
+        }
+        .score-label {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+            margin: 24px 0;
+        }
+        .checklist li {
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+        }
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+        .checklist-icon {
+            width: 24px;
+            height: 24px;
+            background-color: #dbeafe;
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #4f46e5;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 24px 0;
+        }
+        .cta-button:hover {
+            background-color: #4338ca;
+        }
+        .footer {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 12px;
+            margin-top: 32px;
+        }
+        .footer a {
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="logo">CubicleAlly</div>
+            </div>
+
+            <h1>Hi {{ user.first_name|default:"there" }}, time for your weekly check-in!</h1>
+
+            <p>Take a few minutes to reflect on your week and capture your progress toward becoming a {{ profile.target_occupation_title|default:"your target role" }}.</p>
+
+            {% if profile.readiness_score %}
+            <div class="readiness-score">
+                <div class="score">{{ profile.readiness_score }}%</div>
+                <div class="score-label">Your current readiness</div>
+            </div>
+            {% endif %}
+
+            <p><strong>This week, you can:</strong></p>
+            <ul class="checklist">
+                <li>
+                    <span class="checklist-icon">+</span>
+                    Document any wins or accomplishments
+                </li>
+                <li>
+                    <span class="checklist-icon">^</span>
+                    Update your skill progress
+                </li>
+                <li>
+                    <span class="checklist-icon">*</span>
+                    Review your readiness score
+                </li>
+            </ul>
+
+            <div style="text-align: center;">
+                <a href="{{ dashboard_url }}" class="cta-button">Start Check-in</a>
+            </div>
+
+            <p style="color: #6b7280; font-size: 14px;">
+                Every small step counts. Consistent tracking helps you build a compelling case for promotion.
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>
+                Keep climbing!<br>
+                The CubicleAlly Team
+            </p>
+            <p>
+                <a href="{{ dashboard_url }}">Dashboard</a> |
+                <a href="{{ dashboard_url }}/settings">Manage preferences</a>
+            </p>
+            <p>
+                You're receiving this because you enabled weekly check-in reminders.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
