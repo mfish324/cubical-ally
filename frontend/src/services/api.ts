@@ -218,7 +218,9 @@ export const evidenceApi = {
     const response = await api.get('/evidence/', {
       params: skillId ? { skill: skillId } : {},
     });
-    return response.data;
+    // Handle both paginated response { results: [...] } and plain array
+    const data = response.data;
+    return Array.isArray(data) ? data : (data.results || []);
   },
 
   getById: async (id: string): Promise<Evidence> => {
@@ -277,7 +279,9 @@ export const documentApi = {
 
   getAll: async (): Promise<GeneratedDocument[]> => {
     const response = await api.get('/documents/');
-    return response.data;
+    // Handle both paginated response { results: [...] } and plain array
+    const data = response.data;
+    return Array.isArray(data) ? data : (data.results || []);
   },
 
   getById: async (id: string): Promise<GeneratedDocument> => {
@@ -297,7 +301,9 @@ export const documentApi = {
 export const checkinApi = {
   getAll: async (): Promise<CheckinLog[]> => {
     const response = await api.get('/checkins/');
-    return response.data;
+    // Handle both paginated response { results: [...] } and plain array
+    const data = response.data;
+    return Array.isArray(data) ? data : (data.results || []);
   },
 
   submit: async (data: {

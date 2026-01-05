@@ -1,42 +1,59 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react';
 import { Logo } from '@/components/layout';
-import { Button, Card, ProgressRing, Badge, PriorityBadge } from '@/components/ui';
+import { Button, Card, ProgressRing, Badge, PriorityBadge, CareerLoader } from '@/components/ui';
+import { occupationApi } from '@/services/api';
 import { useOnboardingStore } from '@/stores/onboardingStore';
+import type { OccupationSkill } from '@/types';
 
 export default function GapResults() {
   const navigate = useNavigate();
   const {
     currentOccupation,
     targetOccupation,
-    availableSkills,
     skillRatings,
   } = useOnboardingStore();
 
-  // Compute gap analysis locally (before account creation)
+  // Fetch TARGET occupation's skills (not current)
+  const { data: targetSkills, isLoading } = useQuery({
+    queryKey: ['targetOccupationSkills', targetOccupation?.onet_soc_code],
+    queryFn: () => occupationApi.getSkills(targetOccupation!.onet_soc_code, 2.5),
+    enabled: !!targetOccupation?.onet_soc_code,
+  });
+
+  // Compute gap analysis comparing user's skills against TARGET occupation requirements
   const analysis = useMemo(() => {
-    if (!targetOccupation || !availableSkills.length) {
+    if (!targetOccupation || !targetSkills?.length) {
       return null;
     }
 
-    // Create a map of user's skill ratings
-    const userSkillMap = new Map(
+    // Create a map of user's skill ratings (by skill name for cross-occupation matching)
+    const userSkillMapById = new Map(
       skillRatings.map((r) => [r.skillId, r.proficiency])
     );
+    const userSkillMapByName = new Map(
+      skillRatings.map((r) => [r.skillName.toLowerCase(), r.proficiency])
+    );
 
-    const strengths: typeof availableSkills = [];
-    const gaps: Array<{ skill: typeof availableSkills[0]; priority: 'high' | 'medium' | 'low' }> = [];
-    const partials: typeof availableSkills = [];
+    const strengths: OccupationSkill[] = [];
+    const gaps: Array<{ skill: OccupationSkill; priority: 'high' | 'medium' | 'low' }> = [];
+    const partials: OccupationSkill[] = [];
 
     let totalImportance = 0;
     let matchedImportance = 0;
 
-    availableSkills.forEach((occSkill) => {
+    targetSkills.forEach((occSkill) => {
       const importance = occSkill.importance;
       totalImportance += importance;
 
-      const userProficiency = userSkillMap.get(occSkill.skill.id);
+      // Try to match by ID first, then by name (for cross-occupation skill matching)
+      let userProficiency = userSkillMapById.get(occSkill.skill.id);
+      if (!userProficiency) {
+        userProficiency = userSkillMapByName.get(occSkill.skill.name.toLowerCase());
+      }
+
       const requiredLevel = occSkill.level;
 
       // Map proficiency to comparable level (1→2, 2→4, 3→6)
@@ -66,10 +83,10 @@ export default function GapResults() {
       strengths,
       gaps,
       partials,
-      totalSkills: availableSkills.length,
+      totalSkills: targetSkills.length,
       matchedSkills: strengths.length,
     };
-  }, [targetOccupation, availableSkills, skillRatings]);
+  }, [targetOccupation, targetSkills, skillRatings]);
 
   if (!currentOccupation || !targetOccupation) {
     navigate('/');
@@ -108,8 +125,15 @@ export default function GapResults() {
           </h1>
         </div>
 
+        {/* Loading State */}
+        {isLoading && (
+          <Card className="mb-8">
+            <CareerLoader />
+          </Card>
+        )}
+
         {/* Readiness Score */}
-        {analysis && (
+        {!isLoading && analysis && (
           <>
             <Card className="text-center mb-8">
               <ProgressRing

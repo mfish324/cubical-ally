@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, TrendingUp, Sparkles, Target, ArrowRight } from 'lucide-react';
 import { Logo } from '@/components/layout';
-import { Button, Card } from '@/components/ui';
+import { Button, Card, CareerLoader } from '@/components/ui';
 import { occupationApi } from '@/services/api';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import type { Occupation } from '@/types';
@@ -224,20 +224,9 @@ export default function SelectTarget() {
 
         {/* Paths Grid */}
         {isLoading ? (
-          <div className="space-y-4">
-            <Card className="p-6">
-              <div className="flex items-center gap-3">
-                <Sparkles className="w-5 h-5 text-primary-500 animate-pulse" />
-                <div>
-                  <p className="font-medium text-gray-900">Analyzing your career options...</p>
-                  <p className="text-sm text-gray-500">Finding the best paths for you</p>
-                </div>
-              </div>
-            </Card>
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-32 bg-white rounded-lg animate-pulse" />
-            ))}
-          </div>
+          <Card className="mb-8">
+            <CareerLoader />
+          </Card>
         ) : paths.length > 0 ? (
           <div className="space-y-4 mb-8">
             {paths.map((path, index) => (

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { Logo } from '@/components/layout';
-import { Button, Card, CategoryBadge } from '@/components/ui';
+import { Button, Card, CategoryBadge, CareerLoader } from '@/components/ui';
 import { occupationApi } from '@/services/api';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 
@@ -164,11 +164,12 @@ export default function RateSkills() {
 
         {/* Skills List */}
         {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-32 bg-white rounded-lg animate-pulse" />
-            ))}
-          </div>
+          <Card className="mb-8">
+            <CareerLoader variant="compact" />
+            <p className="text-center text-sm text-gray-500 mt-2 pb-4">
+              Loading skills for {currentOccupation.title}...
+            </p>
+          </Card>
         ) : (
           <>
             {categoryOrder.map((category) => {
